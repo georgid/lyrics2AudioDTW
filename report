@@ -1,0 +1,45 @@
+Goal: 
+compare the timing behaviour of the alignment in two settings: with and without lyrics duration information. 
+Duration information is inferred for each lyrics syllable by reading off the score the note duration of its associated tones.
+
+We adopt a score-informed alignment inspired by the idea of linking audio to melody present in the score [sertans sec linking]. 
+
+In a similar way to synthesizing a reference melodic contour, templates of phonemes are concatenated into a template sequence with their corresponding durations.
+
+To do proof of concept, we run a classic DTW between the reference template sequence and audio segments from sarki recordings.
+
+
+experimental setting 1: 
+
+- clean singing voice with no accompaniment, segmented into sections. 10 sections of ~10 seconds each
+- templates = HMM models from turkish speech corpus (states of each HMM)
+- features: MFCCs from HTK
+
+
+
+evaluation criteria for comparison :
+- alignment error
+- how straight are lines ? 
+
+
+
+
+
+results: 
+
+
+parameters: 
+- with and Without mfcc deltas. make sure models are not changed if I take only the mfcc deltas
+- (sp or no sp). because there are mandatory and not optional in the modeling in dtw
+
+- MFCCs type: from Slaney (Essentia? ); from Durrieu
+
+NOTE: features are different from HTK:
+- no cepstral mean norm done
+- no transitional probs used
+
+
+Future Work: 
+- semi hidden markov models
+- read orio;s note duration model, or filips master thesis. 
+ 

@@ -1,0 +1,3 @@
+mblaauw 2014:
+- changed readhtk.m to allow using native byte order reading
+- changed read_htk_hmm.m (shared states, global options, ..)
