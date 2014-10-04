@@ -5,17 +5,19 @@
 % @param listPhonemesWithStates - take from it 'phoneme name' only at indices where
 % phoneme starts
 %
-function [startTimeStamps, listPhonemes ] = parseMinPath(minimalPath, listPhonemesWithStates)
+function [startTimeStamps, listWords ] = parseMinPath_words(minimalPath, listPhonemesWithStates, wordsSequence, withDurations)
 
 %%%%%%%%% phonemes are not empty entries in listphonemes 
 beginIndicesPhonemes = not(cellfun(@isempty, listPhonemesWithStates))';
 
+indicesMatrixWords = beginIndicesPhonemes2BeginIndicesWords(beginIndicesPhonemes, wordsSequence, withDurations)
 
 % word identities
- listPhonemes = listPhonemesWithStates(beginIndicesPhonemes)';
+ listWords = listPhonemesWithStates(indicesMatrixWords)';
 
 
-indicesMatrix2 = vertcat(beginIndicesPhonemes, zeros( size(minimalPath,1)- size(beginIndicesPhonemes,1) ,1) );
+
+indicesMatrix2 = vertcat(indicesMatrixWords, zeros( size(minimalPath,1)- size(indicesMatrixWords,1) ,1) );
 
 
 repIndicesMatrix = repmat(indicesMatrix2, 1, size(minimalPath,2) ); 

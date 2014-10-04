@@ -1,17 +1,18 @@
 function doit
 
-path_testFile = '/Users/joro/Documents/Phd/UPF/adaptation_data_soloVoice/ISTANBUL/'
-pathToModels = '/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/'
-
 
 % here load a file from data.m
 %---------------------------
-%
+
+ANNOTATION_EXT = '.TextGrid'
 
 % parameters: 
 
 hasDeltas =	1;
-withDurations = 1;
+withDurations = 0;
+% 1-words Level
+evalLevel = 0; 
+
 % TODO: decide on: scaled or not 
 
 % read the score 
@@ -20,16 +21,16 @@ addpath('readLyrics');
 
 %%%% calc phoneme durations. manually point to starting and ending noteNums
 %%%% . end is the starting of next syllable
-[phonemes, phonemeDurations] = calcPhonemeDurations(NoteDurations, Lyrics, startNoteNum, endNoteNum);
+[phonemes, phonemeDurations, wordsSequence] = calcPhonemeDurations(NoteDurations, Lyrics, startNoteNum, endNoteNum);
 
 
 
 if withDurations
 	[similarityMatrix, listPhonemesWithStates] = getObsProbGMM_MFCCs_durations(pathToModels, URI_testFile_noExt, phonemes, phonemeDurations, hasDeltas);
-	outputExtension = '.dtwDurationsAligned';
+	DETECTED_EXT = '.dtwDurationsAligned';
 else
 	[similarityMatrix, listPhonemesWithStates] = getObsProbGMM_MFCCs(pathToModels, URI_testFile_noExt, phonemes, phonemeDurations, hasDeltas);
-	outputExtension = '.dtwAligned';
+	DETECTED_EXT = '.dtwAligned';
 end
 
 
@@ -40,10 +41,23 @@ end
 % find optimal path (with min dist)
 [minimalPath, pathXs, pathYs, dist, firstTargetFrameIndex, lastTargetFrameIndex, totalDistMatrix ] = traceBackMinimalPath (totalDistMatrix, backPtrMatrix);
 
-addpath('visualize');
-visualizePath(totalDistMatrix, URI_testFile_noExt, listPhonemesWithStates, pathXs, pathYs)
+% addpath('visualize');
+% visualizePath(totalDistMatrix, URI_testFile_noExt, listPhonemesWithStates, pathXs, pathYs)
 
 % eval. TODO file output
 addpath('eval');
-parseMinPath(minimalPath, listPhonemesWithStates, [URI_testFile_noExt outputExtension] );
+if (evalLevel == 0)
+	[startTimeStamps, listTokens ] = parseMinPath(minimalPath, listPhonemesWithStates );
+else 
+	 [startTimeStamps, listTokens ]  = parseMinPath_words(minimalPath, listPhonemesWithStates, wordsSequence, withDurations  )
+end
 
+writeDetectedToFile ( startTimeStamps, listTokens,  [URI_testFile_noExt DETECTED_EXT], evalLevel );
+
+
+% eval in python 
+detected = [URI_testFile_noExt DETECTED_EXT];
+anno = [URI_testFile_noExt ANNOTATION_EXT];
+
+command = ['/usr/local/bin/python /Users/joro/Documents/Phd/UPF/voxforge/myScripts/AlignmentStep/evaluation/WordLevelEvaluator.py ' anno ' ' detected ' ' int2str(evalLevel)]
+system( command); 

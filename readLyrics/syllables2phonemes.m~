@@ -37,7 +37,7 @@ for i = 1:size(syllables,2)
 			if strcmp(currSyllable(1,j) , ' ') | strcmp(currSyllable(1,j) , '  ')
 				currPhoneme = 'sp';	
 				
-				if (length(currWord)) == 0
+				if (len(currWord)) == 0
 				break;
 				end
 				

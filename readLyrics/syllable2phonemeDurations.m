@@ -31,7 +31,7 @@ for i = 1:size(phonemesSequence,2)
 		% check if vowel
 		vowels = graphemesAndPhonemes{1,2};
 		
-		if ismember(currPhoneme, {vowels{1:9}})
+		if ismember(currPhoneme, {vowels{1:10}})
 			positionVowels = [positionVowels  h];
 		end
 		

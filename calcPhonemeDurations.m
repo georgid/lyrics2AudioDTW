@@ -1,10 +1,11 @@
 %%% @return durations (in terms of frames)
+%	@return phonemesSil - phonemes with padded sil at ends
 %	 @param: startNoteNum  - consecutive number of first note of first
 %	 syllable for audio segment of interest
 %	@param: lyrics - in form of syllables
 %
 
-function [phonemesSil, phonemeDurations] = calcPhonemeDurations(noteDurations, lyrics, startNoteNum, endNoteNum)
+function [phonemesSil, phonemeDurations, wordsSequence] = calcPhonemeDurations(noteDurations, lyrics, startNoteNum, endNoteNum)
 
 %%%% read syllables: 
 addpath('readLyrics');
@@ -37,7 +38,7 @@ graphemesAndPhonemes = textscan(fid, '%s %s', 'Delimiter', '\t');
 fclose(fid);
 
 % syllables to phonemes
-phonemesSequence  = syllables2phonemes(syllables, graphemesAndPhonemes);
+[phonemesSequence, wordsSequence]  = syllables2phonemes(syllables, graphemesAndPhonemes);
 
 % assign durations 
 [ phonemes, phonemeDurations] = syllable2phonemeDurations(phonemesSequence, syllableDurations, graphemesAndPhonemes);
