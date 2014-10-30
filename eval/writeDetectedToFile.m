@@ -66,6 +66,6 @@ c = cell (nrows, NUMTOKENS_PER_LINE);
 
  fclose(fid);
  
- disp(['written file \n' fileName  ]);
+ disp(['written file ' fileName  ]);
  
  

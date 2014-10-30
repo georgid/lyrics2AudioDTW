@@ -4,7 +4,7 @@
 %	to count phonemes in a word 
 %
 %%%%%%
-function beginIndicesWords = beginIndicesPhonemes2BeginIndicesWords(beginIndicesPhonemes, wordsSequence, withDurations)
+function beginIndicesWords = beginIndicesPhonemes2BeginIndicesWords(beginIndicesPhonemes, wordsSequence, hasDurations)
 
 %%%% HERE TAKE ONLY start times of words
 beginIndicesWords = zeros(size(beginIndicesPhonemes)); 
@@ -33,7 +33,7 @@ for wrdIndex = 1:length(wordsSequence)
 end
 
 %  last sil. 
-	if (withDurations)
+	if (hasDurations)
 		ind = indicesOnes(currWordStartIndex) + lengthSilence;
 	else
 % 		FIXME. This does not fit. 

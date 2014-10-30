@@ -28,7 +28,7 @@ costMatrix  = -log(similarityMatrix);
 % 		
 		totalDistMatrix(1,:)= NaN;
 		% increasing costs down on inserted column. To penalize paths
-		% starting farther from start sale
+		% starting farther from start cell
 		avrgCost = 80;
 		totalDistMatrix(:,1) = ([0:LengthQuery-1] * avrgCost )';
 		totalDistMatrix(1,1) = 0;

@@ -1,28 +1,24 @@
 
 Module developed for proof of concept: is timing information from note durations of score helpful to improve alignment? 
 
+
 criteria:
 - alignment error
-- how straight are lines ? 
 
-main function readme
+========================================
+main function: doit
 
-getObsProbGMM_MFCCs - with no timing info
-getObsProbGMM_MFCCs_duraions - with durations info
-
-----
+-	getObsProbGMM_MFCCs - with no timing info
+	getObsProbGMM_MFCCs_duraions - with durations info
 
 - read MFCCs features for file extracted with htk, 
 - load trained HMM speech models
-- for each model (each line) compute for all audio the obs probs as cost
+- for each model (each line) compute for all audio the obs probs as cost and use in cost matrix
 
+======================================
 
-Evaluation run in python : doitForOneFile
+Evaluation run in python : $GITdir/AllignmentStep/dtw/evalDTWmatlab
  
 
-current work: efforts to do scaling of visualisation imscale with hard threshold
 
-----------
-llimitations of loading files :
-TODO: in visualize load TextGrid instead of separate .annoFile
-TODO: read start and end NoteNum from .tsv file instead giving manually
+current work: efforts to do scaling of visualisation imscale with hard threshold

@@ -2,6 +2,8 @@ function [similarityMatrix, listPhonemesWithStates] = getObsProbGMM_MFCCs(pathTo
 
 MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas);
 
+dlmwrite([URI_testFile_noExt  '.mfc_txt'], MFCCs ) ;
+
 listPhonemesWithStates = {};
 numPhonemesInTranscript = size(phonemes,2);
 
