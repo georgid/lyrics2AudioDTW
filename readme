@@ -1,8 +1,12 @@
 
 Module developed for proof of concept: is timing information from note durations of score helpful to improve alignment? 
 
+The repetition of states enforces some minimal duration corresponding to the note durations.
 
-criteria:
+for more details see report file
+
+
+eval. criteria :
 - alignment error
 
 ========================================
