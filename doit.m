@@ -13,7 +13,7 @@ ANNOTATION_EXT = '.TextGrid'
 
 hasDeltas =	1;
 withDurations = 0;
-
+addpath('matlab_htk')
 
 % not scaled only
 % 

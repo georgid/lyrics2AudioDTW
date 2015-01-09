@@ -61,6 +61,7 @@ results:
 
 
 parameters: 
+ADJUSTABLE: 
 - with and Without mfcc deltas. make sure models are not changed if I take only the mfcc deltas
 - (sp or no sp). because there are mandatory and not optional in the modeling in dtw
 
@@ -71,8 +72,6 @@ NOTE: features are different from HTK:
 - no transitional probs used
 
 
-Future Work: 
-- semi hidden markov models
 
 
 
@@ -81,4 +80,9 @@ references:
 how is duration information used in tracking:
 - filips master thesis based on duration of score
 - duration paper Lyrically 
+
+
+finish all tasks in blue and red from prev. weeks
+-essentia MFCCs
+
  

@@ -16,13 +16,18 @@ main function: doit
 	getObsProbGMM_MFCCs_duraions - with durations info
 
 - read MFCCs features for file extracted with htk, 
+	- MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas);
+
 - load trained HMM speech models
+	- loadModels(pathToModels, currModelName, whichState,  hasDeltas );
+
 - for each model (each line) compute for all audio the obs probs as cost and use in cost matrix
+	- loop 
 
 ======================================
 
 Evaluation run in python : $GITdir/AllignmentStep/dtw/evalDTWmatlab
  
 
-
+——
 current work: efforts to do scaling of visualisation imscale with hard threshold

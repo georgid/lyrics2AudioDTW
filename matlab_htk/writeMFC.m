@@ -1,20 +1,11 @@
-function a = writeMFC(args)
+function MFCCs = writeMFC(args)
 
 URI_testFile_noExt = args.filename
+hasDeltas = 1
+MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas);
 
-mfcURI = [URI_testFile_noExt '.mfc'];
+mfcURITxt = [URI_testFile_noExt '.mfc_txt'];
+dlmwrite(mfcURITxt, MFCCs);
 
-if ~exist(mfcURI)
-	command =	['/usr/local/bin/HCopy' ' -A' ' -D' ' -T' ' 1' ' -C' [' /Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/input_files/' 'wav_config_singing '] [URI_testFile_noExt '.wav ']  mfcURI ];
-	a = system(command);
-end
-
-addpath('matlab_htk')
-[MFCCsAll, paramKind ]  = htkread( mfcURI  ); 	
-
-mfcURITxt = [URI_testFile_noExt '.mfc'];
-dlmwrite(mfcURITxt,MFCCsAll)
-
-a  = 'file written'
 
 end
