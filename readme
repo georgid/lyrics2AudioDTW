@@ -21,13 +21,16 @@ main function: doit
 - load trained HMM speech models
 	- loadModels(pathToModels, currModelName, whichState,  hasDeltas );
 
-- for each model (each line) compute for all audio the obs probs as cost and use in cost matrix
+- for each model (each section) compute for all audio the obs probs as cost and use in cost matrix
 	- loop 
 
 ======================================
 
-Evaluation run in python : $GITdir/AllignmentStep/dtw/evalDTWmatlab
+Evaluation 
+doitEval.m:
+
+run in python : $GITdir/AllignmentStep/dtw/evalDTWmatlab
  
 
-——
+??????
 current work: efforts to do scaling of visualisation imscale with hard threshold

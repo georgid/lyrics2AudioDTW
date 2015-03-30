@@ -1,6 +1,7 @@
 function MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas)
 %%%%%%% load htk-extraced mfcc files: 
 addpath('matlab_htk'); % for htkread.m
+addpath('../matlab_htk'); % for htkread.m
 
 mfcURI = [URI_testFile_noExt '.mfc'];
 

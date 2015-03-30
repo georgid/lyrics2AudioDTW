@@ -1,0 +1,6 @@
+function visualizeDistMatrix(totalDistMatrix, fromTs, ToTs)
+numFrPerSecond = 100
+fromFrame = 
+figure; imagesc(totalDistMatrix);figure(gcf);
+
+end

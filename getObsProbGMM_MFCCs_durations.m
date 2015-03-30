@@ -15,7 +15,7 @@ for d=1:numPhonemesInTranscript
 		
 		currModelName = phonemes{d};
 		
-		duration = 3* phonemeDurations(d);
+		duration =  3* phonemeDurations(d);
 		
 		listPhonemesWithStates{whichRowInMatrix} = currModelName ;
 		
@@ -29,7 +29,6 @@ for d=1:numPhonemesInTranscript
 		
 		% all states
 		for whichState = 1:numStates
-			
 			
 			
 			[means, vars2, weights] = loadModels(pathToModels, currModelName, whichState,  hasDeltas );

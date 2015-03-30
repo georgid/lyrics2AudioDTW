@@ -7,6 +7,8 @@
 % for i=1:length(list)
 % URI_testFile_noExt = list{i}
 
+pathToModels =  '/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/';
+
 ANNOTATION_EXT = '.TextGrid'
 
 % parameters: 
@@ -48,7 +50,7 @@ phonemeDurations = textscan(fid, '%f');
 phonemeDurations = phonemeDurations{1,1}';
 fclose(fid);
 
-
+pathToModels = '/Users/joro/Documents/Phd/UPF/voxforge/myScripts/AlignmentDuration/model/hmmdefs9gmm9iter'
 
 
 if withDurations

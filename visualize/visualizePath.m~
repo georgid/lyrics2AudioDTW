@@ -5,12 +5,14 @@ function visualizePath(matrix, fromTs, toTs, URI_testFile_noExt, listPhonemesWit
 
 
 % visualizeDistMatrix(matrix, fromTs, toTs)
-% instead of prev line , this:  
-numFrPerSecond = 100;
-fromFrame = fromTs * numFrPerSecond;
-toFrame = toTs * numFrPerSecond;
-figure; imagesc(matrix(:,fromFrame:toFrame) ); figure(gcf);
+% 
+% numFrPerSecond = 100;
+% fromFrame = fromTs * numFrPerSecond;
+% toFrame = toTs * numFrPerSecond;
+% 
+% figure; imagesc(matrix(:,fromFrame:toFrame) ); figure(gcf);
 
+figure; imagesc(matrix(:,1:)); figure(gcf);
 
 
 %%%% load annotated transcript. first serialize TextGrid to .anno 

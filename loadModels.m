@@ -1,9 +1,9 @@
 % load model parameteres from text files
-function [means, vars2, weights] = loadModels(pathToModels, modelName, whichState,  hasDeltas)
+function [means, vars2, weights] = loadModels(pathToModels, queryModelName, whichState,  hasDeltas)
 
 
 		
-fid = fopen('/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/monophones1');
+fid = fopen('/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/monophones1_full');
 phonemeNames = textscan(fid, '%s');
 
 
@@ -11,10 +11,15 @@ phonemeNames = textscan(fid, '%s');
 for i = 1:size(phonemeNames{1},1)
 	phonemeName = phonemeNames{1}{i};
 
-	if strcmp(phonemeName, modelName)
+	if strcmp(phonemeName, queryModelName)
 		
 			
 			modelMeansURI = [pathToModels  phonemeName int2str(whichState-1) '.means'];
+			if ~exist(modelMeansURI, 'file')
+				
+				fprintf('file: %s does not exist', modelMeansURI);
+			end
+			
 			modelVarsURI = [pathToModels  phonemeName int2str(whichState-1) '.vars'];
 			modelVarsWeights = [pathToModels phonemeName int2str(whichState-1) '.weights'];
 
@@ -55,6 +60,13 @@ for i = 1:size(phonemeNames{1},1)
 end
 
 fclose(fid);
+
+
+	if ~exist('means', 'var')
+		fprintf('model : %s \n' , queryModelName)
+		fprintf('state num : %d \n' , whichState)
+
+	end
 
 
 end

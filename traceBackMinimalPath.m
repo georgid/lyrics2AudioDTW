@@ -29,9 +29,9 @@ pathXs = [];
 		Path=zeros( LengthQuery, LengthTarget);
 		
 		% result is the minimal cost on last row
-% 		[dist, lastTargetFrameIndex] = min( totalDistMatrix(LengthQuery,:));
+		[dist, lastTargetFrameIndex] = min( totalDistMatrix(LengthQuery,:));
 
-		dist = totalDistMatrix(LengthQuery,lastTargetFrameIndex);
+% 		dist = totalDistMatrix(LengthQuery,lastTargetFrameIndex);
 
 		% init
 		col = lastTargetFrameIndex;

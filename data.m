@@ -1,5 +1,7 @@
 
-path_testFile = '/Users/joro/Documents/Phd/UPF/adaptation_data_soloVoice/ISTANBUL/'
+path_testFile = '/Users/joro/Documents/Phd/UPF/ISTANBUL/'
+
+path_testFile = [path_testFile 'guelcin']
 
 pathToModels = '/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/'
 pathToScores = '/Users/joro/Documents/Phd/UPF/turkish-makam-lyrics-2-audio-test-data/'
