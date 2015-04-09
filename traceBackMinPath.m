@@ -2,9 +2,19 @@ function [restart, Path, pathXs, pathYs] = traceBackMinPath(row, col, backPtrMat
 
 	while (row > 1)	% loop until beginning of query
 			backOperation = backPtrMatrix(row, col);
-
+			
 			% prev. state
-			if (backOperation == 2)
+			if (backOperation == 3 )
+				col = col - 1;
+				if row==2
+				disp(fprintf('at column col %d at row 2 backptr says skipped ', col));	
+				row = row - 1;
+				else
+				
+				row = row - 2;
+				end
+			% prev. state
+			elseif (backOperation == 2)
 				col = col - 1;
 				row = row - 1;
 

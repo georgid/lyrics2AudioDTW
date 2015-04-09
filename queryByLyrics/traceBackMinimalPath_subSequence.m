@@ -20,12 +20,13 @@ LengthTarget = size(totalDistMatrix, 2);
 	restart = 1;
 		
 	while (restart == 1)
+		
 		%init path
 		Path=zeros( LengthQuery, LengthTarget);
 		pathYs = [];
 		pathXs = [];
 		
-		% minimal cost on last row
+		% minimal cost from last row
 		[dist, lastTargetFrameIndex] = min( totalDistMatrix(LengthQuery,:));
 		if dist == Inf
 			disp('no path with required minimal duration found');
@@ -43,12 +44,13 @@ LengthTarget = size(totalDistMatrix, 2);
 		
 		[restart, Path, pathXs, pathYs] = traceBackMinPath(row, col, backPtrMatrix, Path, pathXs, pathYs);
 		lenPath = length(pathXs) ;
-		if lenPath == LengthQuery
-			restart = 1;
-		end
+		
+% 		if lenPath ~= LengthQuery
+% 			restart = 1;
+% 		end
 		
 		% blacklist this path
-		if restart
+		if restart == 1
  				totalDistMatrix(LengthQuery, lastTargetFrameIndex )  = inf;
 		end
 		

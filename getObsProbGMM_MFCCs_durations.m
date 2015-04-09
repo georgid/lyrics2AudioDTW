@@ -15,7 +15,9 @@ for d=1:numPhonemesInTranscript
 		
 		currModelName = phonemes{d};
 		
-		duration =  3* phonemeDurations(d);
+% 		duration =  3* phonemeDurations(d);
+		duration =   phonemeDurations(d);
+
 		
 		listPhonemesWithStates{whichRowInMatrix} = currModelName ;
 		

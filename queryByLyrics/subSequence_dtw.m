@@ -22,7 +22,7 @@ function [totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix)
 	%initialize
 		% end space free alignment
 		totalDistMatrix(1,:)=( [0:LengthTarget-1] * 0)';
-		% costInsert on first col
+		
 		totalDistMatrix(:,1) = inf;
 		
 		% increasing costs down on inserted column. To penalize paths
@@ -32,10 +32,11 @@ function [totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix)
 % 		totalDistMatrix(1,1) = 0;
 
     for tIndex=2:LengthTarget
+		disp( tIndex);
         for qIndex=2:LengthQuery
 			
 			
-		
+			
             
 			% next state
 			mNext=totalDistMatrix(qIndex-1, tIndex-1);
@@ -47,14 +48,18 @@ function [totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix)
             % switched off for now. replaced by this one line: 
 			
 % 			% jump to next after next. skip one state
-% 			if qIndex ==2
-% 				m3 = inf;	
-% 			else
-% 				m3 = totalDistMatrix(qIndex-2, tIndex-1);
-% 			end	
+			if qIndex == 2
+				mSkip = inf;	
+			else
+				mSkip = totalDistMatrix(qIndex-2, tIndex-1);
+			end	
+			
+			% take min. no skip
+			[minPathCost, backPtrOperation ] = min( [mSame ; mNext]);
 			
 			% take min
-			[minPathCost, backPtrOperation ] = min( [mSame ; mNext]);
+% 			[minPathCost, backPtrOperation ] = min( [mSame ; mNext; mSkip]);
+			
 			
 			% cost matrix does not have added 0th row and 0th column
 			totalDistMatrix(qIndex,tIndex) = minPathCost + costMatrix(qIndex-1,tIndex-1);
@@ -63,6 +68,10 @@ function [totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix)
 		end % end inner loop
 	end
 	
+		% strip off final rows and columns
+	totalDistMatrix = totalDistMatrix(2:LengthQuery,2:LengthTarget);
+	
+	backPtrMatrix = backPtrMatrix(2:LengthQuery,2:LengthTarget);
 	
     
 end
