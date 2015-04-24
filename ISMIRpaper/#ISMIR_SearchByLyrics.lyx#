@@ -1,0 +1,561 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{multicol}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 10page%
+\topmargin 10theight%
+\rightmargin 10page%
+\bottommargin 10pheight%
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+In this work we investigate the problem of locating the exact occurences
+ of a lyrical query from performance recording for a particular composition.
+ We address the case when a query represents an entire structural section
+ or line from the textual lyrics.
+ The composition is known in advance, but no information about the sctructure
+ of the particular performace is given.
+  This problem is comparable to phrase-spotting when considering speech
+ recordings ([ref]).
+  We assume that the musical score with lyrics is present for the composition
+ of interest.
+ 
+\end_layout
+
+\begin_layout Standard
+It has ben shown the durations of singing voice are quite different than
+ in speech [Anna].
+ Therefore adopting an approach from speech recognition might lack some
+ singing-specific rules (or semantics) including among others note durations.
+ Hitherto approaches do not rely on temporal information.
+ A lot of this information can be infered from musical scores.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Why is it important: 
+\emph default
+Search by lyrics has an inherent connection to the problem of struture discovery.
+ For most types of music a section-long lyrical phrase is a feature that
+ represents the corresponding structural section in a unique way.
+\end_layout
+
+\begin_layout Section
+Architecture
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename queryByLyricsISMIR.eps
+	width 90page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+System Overview
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 1 presents an overview of the porposed approach.
+ 
+\end_layout
+
+\begin_layout Standard
+We propopse a two-pass retrieval approach: On the first pass a subsequence
+ DTW retrieves a set of candiate audio segments that roughly correspond
+ to a query.
+ On the second pass each candidate segment is separately fed into the HHMM,
+ for which we run a Viterbi decoding to assure that only one (the most optimal)
+ path is detected for an audio segment.
+ Any query-to-audio fullpath match is considered as a hit and all results
+ are ranked according to their respective likelihoods.
+ 
+\end_layout
+
+\begin_layout Paragraph
+Tempo Estimation
+\end_layout
+
+\begin_layout Standard
+TODO: 
+\end_layout
+
+\begin_layout Paragraph*
+Query generation
+\end_layout
+
+\begin_layout Standard
+The query sequence is constructed by expanding a lyrical phrase to its constitue
+nt syllables.
+ For each syllable a reference duration is derived from the values of its
+ corresponding musical notes.
+ Then the reference duration is spread among its constituent phonemes, whereby
+ consonants are assigned constant duration and the rest is assigned to the
+ vowel, resulting into a list of phoneme reference durations R_p for each
+ phoneme p.
+\end_layout
+
+\begin_layout Standard
+Then each phoneme is  by its 3-state model (3 GMMs represent respectively
+ the beginning, middle and ending acoustic states of a phoneme) 
+\end_layout
+
+\begin_layout Standard
+To query a particular performance, the score-inferred R_i are linearly rescaled
+ to match its musical tempo.
+\end_layout
+
+\begin_layout Section
+Retrieval of candidate segments by subsequence DTW
+\end_layout
+
+\begin_layout Standard
+Subsequence DTW is a dynamic programming technique that has been applied
+ to phrase-spotting from speech[].
+ In this example series of timbral features from a recorded spoken utterance
+ appear as a subsequence of features in a target recording, containing the
+ utterance of interest.
+ In our case a query of phoneme models 
+\begin_inset Formula $X$
+\end_inset
+
+ can be seen as subsequence of the series of MFCC features 
+\begin_inset Formula $Y$
+\end_inset
+
+ extracted from the whole recording.
+ To this end we define a distance metric for a frame 
+\begin_inset Formula $y_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $n^{th}$
+\end_inset
+
+ model 
+\begin_inset Formula $x_{n}$
+\end_inset
+
+ as a function of the posterior probability 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $d(m,n)=-log\thinspace p(y_{m}|x_{n})$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+cut off step
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Path computation:
+\end_layout
+
+\begin_layout Standard
+For an alignment path 
+\begin_inset Formula $p_{l}$
+\end_inset
+
+ we select step sizes 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p_{l}-p_{l-1}=(1,1),(1,0),(1,2)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ according to the notation of [Mueller].
+ The step size 
+\begin_inset Formula $(0,1)$
+\end_inset
+
+ is disallowed because each audio frame has to map to exactly one phonetic
+ model.
+  To counteract the preference for the diagonal step 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $(1,1)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+and the skip step 
+\begin_inset Formula $(1,2)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+  local weights 
+\begin_inset Formula $w_{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{s}$
+\end_inset
+
+ are introduced (as suggested in [Mueller]).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+TODO: make sure minimal unit imposes fastest tempo.
+\end_layout
+
+\begin_layout Plain Layout
+If some phoneme not pronounced, might be good idea to allow (1,2).
+ [ref.
+ Ney] but we do not do it, since we want to resemble forced alignment.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename accumMatrix_sakinGecKalmaOneSection.png
+	lyxscale 20
+	width 90page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example candidate audio segment of many overlapped paths (two main)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Candidate segment selection:
+\end_layout
+
+\begin_layout Standard
+We define an overlapped audio segment to be any segment from the target
+ audio, for which any 
+\begin_inset Formula $y_{m}$
+\end_inset
+
+ belongs to more than one path 
+\begin_inset Formula $p$
+\end_inset
+
+.
+ Let us call the set of paths for an overlapped audio segment an overlapped
+ path set (see figure 2).
+ Then as candidate segment is considered the audio segment span from the
+ initial timestamp of the leftmost path until the final timestamp of the
+ rightmost path.
+ We assume that a concentration of found paths within a segment indicates
+ at least one true hit.
+ 
+\end_layout
+
+\begin_layout Section
+HHMModel
+\end_layout
+
+\begin_layout Standard
+The position in the score in velocity.
+ A unit is different per a composition and is computed so: one minimal unit
+ from score (in number of frames according to a factor of tempo indicated
+ in score).
+ The model moves.
+ 
+\end_layout
+
+\begin_layout Standard
+It has two sections S = {Q,F}, where Q is the queried section and F is the
+ filler model 
+\end_layout
+
+\begin_layout Subsection
+transition model 
+\end_layout
+
+\begin_layout Standard
+velocity variable
+\end_layout
+
+\begin_layout Standard
+asd
+\end_layout
+
+\begin_layout Standard
+position varible 
+\end_layout
+
+\begin_layout Standard
+where the modulus operator resets the position to be in a beginning of a
+ new section after it exceeds previous section's duration 
+\begin_inset Formula $D(s_{n-1})$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+section variable
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $p(s_{n}|s_{n-1},p_{n-1,}p_{n})=p_{s}(s_{n}|s_{n-1}),p_{n}\leq p_{n-1}1,p_{n}>p_{n-1},s_{n}=s_{n-1}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A lack of increase in the position is an indicator that a new section should
+ be started.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $p_{s}(s_{n}|s_{n-1})=p_{q},s_{n}=s_{n-1}=Q$
+\end_inset
+
+ governs the self transitions and can be set according the expected structure
+ of the queried audio.
+ In our case we set p_q=0 and p_f=0.9 to decrease the possibility of having
+ the query section more than once in the candidate audio.
+ 
+\end_layout
+
+\begin_layout Section
+Experimental Setup
+\end_layout
+
+\begin_layout Standard
+A query section consist of 7-10 words.
+\end_layout
+
+\begin_layout Section
+Evaluation
+\end_layout
+
+\begin_layout Standard
+prec and recall of subsequence-DTW
+\end_layout
+
+\begin_layout Standard
+prec and recall at the end of DTW
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+The flexibility of DTW step size strategy results in good recall.
+ (measure this).
+ Viterbi is good in exact matching 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
