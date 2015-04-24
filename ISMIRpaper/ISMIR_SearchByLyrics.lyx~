@@ -77,7 +77,7 @@
 \begin_body
 
 \begin_layout Title
-Search by lyrical phrases in acapella Turkish Makam recordings 
+Query by lyrical phrases in acapella Turkish Makam recordings 
 \end_layout
 
 \begin_layout Section
@@ -85,7 +85,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-In this work we investigate the problem of locating the exact occurences
+In this work we investigate the problem of locating the exact occurrences
  of a lyrical query from performance recording for a particular composition.
  We address the case when a query represents an entire structural section
  or phrase from textual lyrics.
@@ -162,7 +162,7 @@ Figure 1 presents an overview of the proposed approach.
 
 \begin_layout Standard
 We propose a two-pass retrieval approach: On the first pass a subsequence
- DTW retrieves a set of candiate audio segments that roughly correspond
+ DTW retrieves a set of candidate audio segments that roughly correspond
  to a query.
  On the second pass each candidate segment is separately fed into the HHMM,
  for which we run a Viterbi decoding to assure that only one (the most optimal)
@@ -504,7 +504,7 @@ asd
 \end_layout
 
 \begin_layout Standard
-position varible 
+position variable 
 \end_layout
 
 \begin_layout Standard
