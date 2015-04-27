@@ -80,8 +80,58 @@
 Search by lyrical phrases in acapella Turkish Makam recordings 
 \end_layout
 
+\begin_layout Abstract
+In this work we propose an approach for locating the exact occurrences of
+ a lyrical query in musical audio, a problem known in speech processing
+ research as keyphrase-spotting.
+ A query is constructed by expanding text to MFCC-based phoneme models,
+ which are trained only on speech.
+ To address the differences of syllable durations, specific for singing,
+ durations inferred from musical score are incorporated in the phonetic
+ query.
+ 
+\end_layout
+
+\begin_layout Abstract
+In a first step we apply a dynamic time warping to estimate candidate segments.
+ In a second step these audio segments are ranked by means of a novel hierarchic
+al hidden Markov model (HHMM), which models a query as a separate structural
+ section.
+\end_layout
+
+\begin_layout Abstract
+The proposed approach is evaluated on a small acapella dataset of recordings
+ from Turkish Makam recordings.
+ Results show that the combination of the good recall of the DTW and the
+ good precision of HHMM is promising, even with the standard phoneme speech
+ models.
+ 
+\end_layout
+
+\begin_layout Abstract
+
+\color red
+A comparison to a s.o.a.
+ keyword-spotting system is done.
+ 
+\end_layout
+
+\begin_layout Abstract
+Being on of the first methods for searching by lyrics, and the first on
+ non-eurogenetic music in particular, we expect that it can serve as a baseline
+ for further MIR research on the topic.
+\end_layout
+
 \begin_layout Section
 Introduction
+\end_layout
+
+\begin_layout Standard
+
+\color red
+TODO: rewrite first paragraph and reorder
+\color inherit
+ 
 \end_layout
 
 \begin_layout Standard
@@ -162,8 +212,11 @@ Figure 1 presents an overview of the proposed approach.
 
 \begin_layout Standard
 We propose a two-pass retrieval approach: On the first pass a subsequence
- DTW retrieves a set of candidate audio segments that roughly correspond
- to a query.
+ DTW retrieves a set of candidate audio segments that 
+\color red
+roughly
+\color inherit
+ correspond to a query.
  On the second pass each candidate segment is separately fed into the HHMM,
  for which we run a Viterbi decoding to assure that only one (the most optimal)
  path is detected for an audio segment.
