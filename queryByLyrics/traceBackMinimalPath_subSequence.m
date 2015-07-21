@@ -1,4 +1,4 @@
-% Traces the path with minimal total distance. Iterates until Makes sure path begins at
+% Traces the path with minimal total distance. Iterates until the found path begins at
 % first frame of query
 
 % @param totalDistMatrix - matrix with distances
@@ -8,12 +8,15 @@
 
 % @return totalDistMatrix is returned since once finding min-Path, we can
 % exclude this and continue to search for next min path. This is needed if
-% we need more than one min path. Currently not used
+% we need more than one min path. 
 
 function [Path, pathXs, pathYs, dist, firstTargetFrameIndex, lastTargetFrameIndex, totalDistMatrix ] = traceBackMinimalPath_subSequence (totalDistMatrix, backPtrMatrix)	
 
 LengthQuery = size(totalDistMatrix, 1);
 LengthTarget = size(totalDistMatrix, 2);
+
+% means no path found
+firstTargetFrameIndex = -1;
 
 
 % find the best path in the matrix
@@ -28,6 +31,10 @@ LengthTarget = size(totalDistMatrix, 2);
 		
 		% minimal cost from last row
 		[dist, lastTargetFrameIndex] = min( totalDistMatrix(LengthQuery,:));
+		
+% 		lastTargetFrameIndex = LengthTarget;
+% 		dist = totalDistMatrix(LengthQuery,LengthTarget);
+		
 		if dist == Inf
 			disp('no path with required minimal duration found');
 			return;

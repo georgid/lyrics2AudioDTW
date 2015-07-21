@@ -1,4 +1,4 @@
-function [totalDistMatrix, costMatrix, backPtrMatrix]  = searchDTW(URI_targetFile_noExt, simMatrix, listPhonemesWithStates, fromFrame, toFrame)
+function [totalDistMatrix, costMatrix, backPtrMatrix]  = searchDTW(simMatrix, fromFrame, toFrame, penaltyNextState)
 
 
 if fromFrame==0 && toFrame  == 0
@@ -20,7 +20,7 @@ costMatrix  = -log(simMatrix(:,fromFrame: toFrame));
 addpath('visualize');
 
 % subseq dtw, returns -loglikmatrix 
-[totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix);
+[totalDistMatrix, backPtrMatrix] = subSequence_dtw(costMatrix, penaltyNextState);
 
 
 

@@ -1,7 +1,19 @@
 function [restart, Path, pathXs, pathYs] = traceBackMinPath(row, col, backPtrMatrix, Path, pathXs, pathYs)
 
-	while (row > 1)	% loop until beginning of query
+	while (row >= 2)	% loop until beginning of query
 			backOperation = backPtrMatrix(row, col);
+			
+				% BREAK CONDITION: reached first frame of target before first
+			% frame of query
+			if(col == 1)
+				% blacklist this path
+% 				totalDistMatrix(LengthQuery, lastTargetFrameIndex )  = inf;
+				
+				restart = 1;
+				disp('not full path for whole length of query');
+				return;
+			end
+			
 			
 			% prev. state
 			if (backOperation == 3 )
@@ -28,17 +40,7 @@ function [restart, Path, pathXs, pathYs] = traceBackMinPath(row, col, backPtrMat
 				return;
 			end
 
-			% BREAK CONDITION: reached first frame of target before first
-			% frame of query
-			if(col == 0)
-				% blacklist this path
-% 				totalDistMatrix(LengthQuery, lastTargetFrameIndex )  = inf;
-				
-	
-				restart = 1;
-				disp('not full path for whole length of query');
-				return;
-			end
+		
 			
 			% add to path
 			Path( row , col ) = 1;

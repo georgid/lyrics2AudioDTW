@@ -10,13 +10,11 @@ function listPhonemesWithStates = phonemes2listPhonemesWithStates(phonemes_URI, 
 
 	phonemeDurations = [];
 
-	if withDurations
 
 		fid = fopen(phonemeDurations_URI,'r');
 		phonemeDurations = textscan(fid, '%f');
 		phonemeDurations = phonemeDurations{1,1}';
 		fclose(fid);
-	end
 
 
 	listPhonemesWithStates = {};

@@ -3,9 +3,13 @@ path_testFile = '/Users/joro/Documents/Phd/UPF/ISTANBUL/'
 
 path_testFile = [path_testFile 'guelcin']
 
+path_testFile = '/Users/joro/Documents/Phd/UPF/arias/';
+
+
 pathToModels = '/Users/joro/Documents/Phd/UPF/voxforge/auto/scripts/interim_files/'
 pathToScores = '/Users/joro/Documents/Phd/UPF/turkish-makam-lyrics-2-audio-test-data/'
 
+wavFiles = dir(fullfile(path_testFile, '*.wav'))
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % % % TODO: put errors for all pieces into an array and take stats form all
@@ -15,7 +19,8 @@ pathToScores = '/Users/joro/Documents/Phd/UPF/turkish-makam-lyrics-2-audio-test-
 addpath('matlab_htk')
 
 list = {}
-wavFiles = dir(fullfile(path_testFile, '*_from_*.wav'))
+% wavFiles = dir(fullfile(path_testFile, '*_from_*.wav'))
+wavFiles = dir(fullfile(path_testFile, '*.wav'))
 
 for ind = 1: length(wavFiles)
 	[a,nameNoExt,c] = fileparts(wavFiles(ind).name)
@@ -36,10 +41,15 @@ end
 %##########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%% DEFINE file manually: 
 
+% idil - kimseye
+
+URI_score = [pathToScores 'nihavent--sarki--curcuna--kimseye_etmem--kemani_sarkis_efendi'];
+URI_wholeAudio_noExt = '/Users/joro/Documents/Phd/UPF//ISTANBUL//idil/Melihat_Gulses';
 
 %%%%goekhan - kimseye
 
 URI_score = [pathToScores 'nihavent--sarki--curcuna--kimseye_etmem--kemani_sarkis_efendi'];
+URI_wholeAudio_noExt = '/Users/joro/Documents/Phd/UPF//ISTANBUL//goekhan/';
 
 
 list  = { [path_testFile  'goekhan/02_Kimseye_3_zemin'],
@@ -52,7 +62,6 @@ list  = { [path_testFile  'goekhan/02_Kimseye_3_zemin'],
 [path_testFile  'goekhan/02_Kimseye_8_meyan'],
 [path_testFile  '/goekhan/02_Kimseye_9_nakarat']
 }
-
 
 
 % goekhan - gel 

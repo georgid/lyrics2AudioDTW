@@ -1,6 +1,29 @@
-function visualizeDistMatrix(totalDistMatrix, fromTs, ToTs)
-numFrPerSecond = 100
-fromFrame = 
-figure; imagesc(totalDistMatrix);figure(gcf);
+function visualizeDistMatrix(totalDistMatrix, fromTs, toTs)
+numFrPerSecond = 100;
+fromFrame = fromTs * numFrPerSecond;
+toFrame = toTs * numFrPerSecond;
+
+if fromFrame==0 && toFrame  == 0
+	fromFrame = 1
+	toFrame = size(matrix,2) 
+end
+
+
+figure; imagesc(totalDistMatrix(:,fromFrame:toFrame) ); figure(gcf);
 
 end
+
+
+
+
+
+numFrPerSecond = 100;
+fromFrame = fromTs * numFrPerSecond;
+toFrame = toTs * numFrPerSecond;
+
+if fromFrame==0 && toFrame  == 0
+	fromFrame = 1
+	toFrame = size(matrix,2) 
+end
+
+figure; imagesc(matrix(:,fromFrame:toFrame) ); figure(gcf);

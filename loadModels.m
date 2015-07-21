@@ -14,14 +14,14 @@ for i = 1:size(phonemeNames{1},1)
 	if strcmp(phonemeName, queryModelName)
 		
 			
-			modelMeansURI = [pathToModels  phonemeName int2str(whichState-1) '.means'];
+			modelMeansURI = [pathToModels  phonemeName int2str(whichState) '.means'];
 			if ~exist(modelMeansURI, 'file')
 				
 				fprintf('file: %s does not exist', modelMeansURI);
 			end
 			
-			modelVarsURI = [pathToModels  phonemeName int2str(whichState-1) '.vars'];
-			modelVarsWeights = [pathToModels phonemeName int2str(whichState-1) '.weights'];
+			modelVarsURI = [pathToModels  phonemeName int2str(whichState) '.vars'];
+			modelVarsWeights = [pathToModels phonemeName int2str(whichState) '.weights'];
 
 			% 	
 			% means = dlmread('/Users/joro/Documents/Phd/UPF/voxforge/myScripts/htk2s3/compare/testmeans')

@@ -1,10 +1,24 @@
-function similarityMatrix = calcSimMatrixLyrics(pathToModels,  stateNewtork1, stateNetwork2, hasDeltas)
+%%%%
+% @param queryPhonemeStates on the vert. axis
+% @partm targetPhonemeStates on the horizontal (instead of audio query) : takes
+% mean of component with biggest weight as if it were a feature vector
+% 
 
-addpath('..');
 
-numStates1 = size(stateNewtork1,2);
+function similarityMatrix = calcSimMatrixLyrics(pathToModels,  queryPhonemeStates, targetPhonemeStates, hasDeltas, withRealFeatures, listStartNonVocalSections, listEndNonVocalSections, withSilenceCutOff)
 
-numStates2 = size(stateNetwork2,2);
+addpath('/Users/joro/Documents/Phd/UPF/voxforge/myScripts/lyrics_magic/');
+addpath('/Users/joro/Documents/Phd/UPF/voxforge/myScripts/lyrics_magic/queryByLyrics');
+
+numFramesPerSec = 100;
+
+numStates1 = size(queryPhonemeStates,2);
+
+if withRealFeatures
+	numStates2 = size(targetPhonemeStates,1);
+else
+	numStates2 = size(targetPhonemeStates,2);
+end
 
 similarityMatrix = zeros(numStates1, numStates2);
 
@@ -20,17 +34,50 @@ for rowIdx = 1:numStates1
 		% used obs. posterior prob form trained model 
 % 		similarityMatrix(d,f) = getObsProb(aggregFeatureVectors, gmm, d);
 		
-		fullModelName = stateNewtork1{rowIdx};		
+		fullModelName = queryPhonemeStates{rowIdx};		
 		
-		[loadedGmm1, modelNames, gmms] = checkModelAndLoadGmm(fullModelName, modelNames, gmms, pathToModels, hasDeltas);
+		[isModelSilence, loadedGmm1, modelNames, gmms] = checkModelAndLoadGmm(fullModelName, modelNames, gmms, pathToModels, hasDeltas);
+		
+		
+			
+		if ~withRealFeatures
+			% reinitialize points from all columns for this row
+			samplePoints = getSamplePoints(targetPhonemeStates, modelNames, gmms, pathToModels, hasDeltas);
+		else
+			samplePoints = targetPhonemeStates;
+		end
+		
+		obsProbsRowT =  pdf(loadedGmm1, samplePoints);
+		
+		if withSilenceCutOff
+			obsProbsRowT = cutOffSilentRegions( isModelSilence, obsProbsRowT,  listStartNonVocalSections, listEndNonVocalSections, numFramesPerSec );
+		end 
+		
+		similarityMatrix(rowIdx,:) = obsProbsRowT'; 
+			
+		disp(fprintf('at row %d out of %d', rowIdx, numStates1));
+		
+end	% end of row loop
+		
+end	
 
-		% reinitialize points from all columns for this row
+
+
+
+
+%%%%%%%%%[%
+% generate sample fueature vectors from models
+function samplePoints = getSamplePoints(targetPhonemeStates, modelNames, gmms, pathToModels, hasDeltas)
+		
+		numStates2 = size(targetPhonemeStates,2);
+
 		samplePoints = [];
+		
 		for colIdx = 1:numStates2
 			
-					fullModelName = stateNetwork2{colIdx};
+			fullModelName = targetPhonemeStates{colIdx};
 		
-				[loadedGmm2, modelNames, gmms] = checkModelAndLoadGmm(fullModelName, modelNames, gmms , pathToModels, hasDeltas);
+			[isSilence, loadedGmm2, modelNames, gmms] = checkModelAndLoadGmm(fullModelName, modelNames, gmms , pathToModels, hasDeltas);
 
 			
 			
@@ -48,37 +95,5 @@ for rowIdx = 1:numStates1
 			
 			samplePoints = [samplePoints; samplePoint];
 		end
-			
-		obsProbsT =  pdf(loadedGmm1, samplePoints);
 
-			
-		similarityMatrix(rowIdx,:) = obsProbsT'; 
-			
-		disp(fprintf('at row %d out of %d', rowIdx, numStates1));
-		
-end	% end of row loop
-		
-end	
-
-function [loadedGmm, modelNames, gmms, means, weights] = checkModelAndLoadGmm(fullModelName, modelNames, gmms, pathToModels, hasDeltas)
-
-[isMemb, idx] = ismember(fullModelName, modelNames);
-		if isMemb
-			loadedGmm = gmms{idx};
-		
-		else % create
-			
-			[currModelName, whichState] = parseModelName(fullModelName );
-			[means, vars2, weights] = loadModels(pathToModels, currModelName, whichState,  hasDeltas );
-			loadedGmm = gmdistribution(means,vars2,weights);
-			
-		% store created gmm and name
-			sizeNames = size(modelNames,1);
-			modelNames{sizeNames + 1} = fullModelName;
-			
-			sizeGmm = size(gmms,1);
-			gmms{sizeGmm + 1} = loadedGmm;
-			
-		end
-		
 end

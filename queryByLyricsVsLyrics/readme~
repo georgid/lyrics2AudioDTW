@@ -1,0 +1,20 @@
+Calculate N minimal alignment paths 
+
+
+
+- compute histogram
+	-cutoff according to a threshold at the peak of a histogram - inspired by the vowel chart? 
+
+
+- weighting of paths
+
+
+- blacklisting
+
+
+
+main method: 
+doit.m
+
+input: 
+pathsXBegins.tsv

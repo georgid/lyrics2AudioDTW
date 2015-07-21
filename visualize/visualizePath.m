@@ -1,29 +1,29 @@
 
 %%%% visualize cost matrix and transcript
 
-function visualizePath(matrix, fromTs, toTs, URI_testFile_noExt, listPhonemesWithStates, pathXs, pathYs)
+function visualizePath(matrix, fromTs, toTs, URI_testFile_noExt, listPhonemesWithStates)
 
 
-% visualizeDistMatrix(matrix, fromTs, toTs)
-% instead of prev line , this:  
-numFrPerSecond = 100;
-fromFrame = fromTs * numFrPerSecond;
-toFrame = toTs * numFrPerSecond;
-figure; imagesc(matrix(:,fromFrame:toFrame) ); figure(gcf);
+%  serialize TextGrid to .anno 
+
+addpath('../queryByLyrics'); 
 
 
+%  serialize TextGrid to .anno 
+command = ['/usr/local/bin/python /Users/joro/Documents/Phd/UPF/voxforge/myScripts/AlignmentDuration/dtw/textGrid2Anno.py '   num2str(SECTION_NUM) ' ' URI_testFile_noExt ];
+[status, URI_anno] = system( command); 
+URI_anno = strtrim(URI_anno);
 
-%%%% load annotated transcript. first serialize TextGrid to .anno 
-%%%% TODO: read annotations from TextGrid
-
-URI_anno = [URI_testFile_noExt '.anno'];
+%%%% load annotated transcript .anno
+% URI_anno = [URI_testFile_noExt '.TextGrid.anno'];
 if exist(URI_anno)
-	fid = fopen([URI_testFile_noExt '.anno']);
-	annotation = textscan(fid, '%f %f %s');
+	fid = fopen(URI_anno);
+	annotation = textscan(fid, '%f %f %s', 'Delimiter','\n');
 	fclose(fid);
 
-	% draw vertical annotation lines
-	drawAnnotations(annotation, fromTs, toTs);
+	
+	drawAnnotation(annotation, fromTs, toTs);
+
 else
 	disp(['no file .anno found for' URI_testFile_noExt ]);
 end
@@ -32,4 +32,3 @@ end
 set(gca, 'YTick',1:size(listPhonemesWithStates,2), 'YTickLabel', listPhonemesWithStates');
 figure(gcf);
 
-hold on; plot(pathXs, pathYs, '*', 'Color', 'k' );

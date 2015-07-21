@@ -1,0 +1,35 @@
+
+Module developed for proof of concept: is timing information from note durations of score helpful to improve alignment? 
+
+The repetition of states enforces some minimal duration corresponding to the note durations.
+
+for more details see report file
+
+
+eval. criteria :
+- alignment error
+
+========================================
+main function: doit
+
+-	getObsProbGMM_MFCCs - with no timing info
+	getObsProbGMM_MFCCs_duraions - with durations info
+
+- read MFCCs features for file extracted with htk, 
+	- MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas);
+
+- load trained HMM speech models
+	- loadModels(pathToModels, currModelName, whichState,  hasDeltas );
+
+- for each model (each section) compute for all audio the obs probs as cost and use in cost matrix
+	- loop 
+
+======================================
+
+Evaluation 
+doitEval.
+run in python : $GITdir/AllignmentStep/dtw/evalDTWmatlab
+ 
+
+??????
+current work: efforts to do scaling of visualisation imscale with hard threshold

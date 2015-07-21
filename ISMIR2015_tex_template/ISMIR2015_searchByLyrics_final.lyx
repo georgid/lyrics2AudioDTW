@@ -1,0 +1,3641 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+% -----------------------------------------------
+% Template for ISMIR Papers
+% 2015 version, based on previous ISMIR templates
+% -----------------------------------------------
+
+\usepackage{ismir}
+\usepackage{cite}
+
+% Title.
+% ------
+\title{Searching Lyrical Phrases in A-capella Turkish Makam Recordings}
+
+
+% Single address
+% To use with only one author or several with the same address
+% ---------------
+\oneauthor
+{Georgi Dzhambazov, Sertan {\c S}ent{\"u}rk, Xavier Serra }
+{Music Technology Group, Universitat Pompeu Fabra, Barcelona \\ {\tt \{georgi.dzhambazov, sertan.senturk, xavier.serra\}@upf.edu }}
+
+
+% Two addresses
+% --------------
+%\twoauthors
+%  {First author} {School \\ Department}
+%  {Second author} {Company \\ Address}
+
+% Three addresses
+% --------------
+%\threeauthors
+ % {Georgi Dzhambazov}{\\{\tt georgi.dzhambazov@upf.edu}}
+%  {Sertan {\c S}ent{\"u}rk} {Music Technology Group, Pompeu Fabra Universitat, Barcelona \\ {\tt  sertan.senturk@upf.edu}}
+%  {Xavier Serra}{\\{\tt xavier.serra@upf.edu}}
+
+% Four addresses
+% --------------
+%\fourauthors
+%  {First author} {Affiliation1 \\ {\tt author1@ismir.edu}}
+%  {Second author}{Affiliation2 \\ {\tt author2@ismir.edu}}
+%  {Third author} {Affiliation3 \\ {\tt author3@ismir.edu}}
+%  {Fourth author} {Affiliation4 \\ {\tt author4@ismir.edu}}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+maketitle
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Abstract
+Search by lyrics, the problem of locating the exact occurrences of a phrase
+ from lyrics in musical audio, is a recently emerging research topic.
+ Unlike key-phrases in speech, lyrical key-phrases have durations that bear
+ important relation to other musical aspects like the structure of a composition.
+ In this work we propose an approach that address the differences of syllable
+ durations, specific for singing.
+ First a phrase is expanded to MFCC-based phoneme models, trained on speech.
+ Then, we apply dynamic time warping between the phrase and audio to estimate
+ candidate audio segments in the given audio recording.
+ Next, the retrieved audio segments are ranked by means of a novel score-informe
+d hidden Markov model, in which durations of the syllables within a phrase
+ are explicitly modeled.
+ The proposed approach is evaluated on 12 a-capella audio recordings of
+ Turkish Makam music.
+ Relying on standard speech phonetic models, we arrive at promising results
+ that outperform a baseline approach unaware of lyrics durations.
+ To the best of our knowledge, this is the first work tackling the problem
+ of search by lyrical key-phrases.
+ We expect that it can serve as a baseline for further research on singing
+ material with similar musical characteristics.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Searching by lyrics is the problem of locating the exact occurrences of
+ a key-phrase from textual lyrics in musical signal
+\color black
+.
+ It has inherent relation to the 
+\color inherit
+problem of keyword spotting in speech, 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+(therefore it is a.k.a.
+ keyword spotting in singing)
+\end_layout
+
+\end_inset
+
+
+\color black
+ which is a long-investigated research task 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "mandal2014recent"
+
+\end_inset
+
+.
+ In keyword spotting, a user is interested to find at which time position
+ in speech a relevant keyword (presenting a topic of interest) is spoken.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\color black
+Most of the work on searching for keywords/key-phrases in singing has borrowed
+ concepts and ideas from its equivalent problem for speech.
+
+\color inherit
+ For spoken utterances phonemes have relatively similar duration across
+ speakers.
+ Unlike that, in singing durations of phonemes (especially vowels) have
+ higher variation 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kruspekeyword"
+
+\end_inset
+
+.
+ When being sung, vowels 
+\color black
+are prolonged according to musical note values.
+ Therefore, adopting an approach from speech recognition might lack some
+ singing-specific semantics, including among others durations of sung syllables.
+
+\color inherit
+ Furthermore, in comparison to keyword spotting, we believe that key-phrase
+ detection has higher potential to be integrated with other relevant MIR-applica
+tions, because lyrical key-phrases are often correlated to musical structure.
+ For most types of music a section-long lyrical phrase is a feature that
+ represents the corresponding structural section (e.g.
+ chorus) in a unique way.
+ Therefore correctly retrieved audio segments for, for example, the first
+ lyrics line for a chorus can serve as a structure discovery tool.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+A characteristic phrase from audio is ususally has stable lyrics, while
+ melody can vary.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+In this work we investigate searching by lyrics in the case when a query
+ represents an entire section or phrase from the textual lyrics of a particular
+ composition.
+ Unlike keyword-spotting or query-by-humming where a hit would be a document
+ from an entire collection, in our case a hit is the occurrence of a phrase,
+ being retrieved only from all performances of the given composition.
+ In this respect the problem setting is more similar to linking melodic
+ patterns from score to musical audio (addressed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "sertanTonic"
+
+\end_inset
+
+), rather than to keyword-spotting.
+  We assume that the musical score with lyrics is present for the composition
+ of interest.
+ The proposed approach has been tested on a small dataset of a-cappella
+ performances from a repertoire of Turkish Makam music.
+ For a given performance, the composition is known in advance, but no informatio
+n about the structure is given.
+ Characteristic for Makam music is that, in a performance there might be
+ reordering or repetitions of score sections.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide true
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename systemOverview.eps
+	width 60page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Approach overview: A key-phrase query is constructed in two variants: in
+ the first stage candidate segments from audio are retrieved.
+ In the second stage the query is modeled by a DBN-HMM aware of the position
+ in music score.
+ The DBN-HMM decodes and ranks candidate segments 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Related Work
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Spoken term detection in speech
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Keyword spotting in singing
+\end_layout
+
+\begin_layout Standard
+
+\color black
+A recent work proved that keyword spotting in singing voice is a hard problem
+ even when singing material is a-capella (for pop songs in English) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kruspekeyword"
+
+\end_inset
+
+.
+ The authors adopt an approach from spotting keywords for speech, using
+ a compound hidden Markov model (HMM) with keyword and filler model.
+ Keywords are automatically extracted from a textual collection of lyrics.
+ This work's best classifier (multi-layer perceptron) yielded an f-measure
+ of 44%, averaged over top 50% of keywords.
+ Notably, the achieved results on singing material are not very different
+ from results on spoken utterances of same keywords.
+ 
+\end_layout
+
+\begin_layout Standard
+One of the few attempts to go beyond keywords is the work of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "fujihara2008hyperlinking"
+
+\end_inset
+
+.
+ Their goal was to automatically link phrases that appear in the lyrics
+ of one song to the same phrase in another song.
+ To this end, a keyword-filler model is utilized for detecting characteristic
+ phrases (of 2-3 words) in sung audio.
+ The method has been evaluated on polyphonic audio from Japanese pop
+\color black
+, achieving 30% correctly identified links
+\color inherit
+.
+ Another modeling approach has been chosen in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dittmar2012towards"
+
+\end_inset
+
+.
+ The authors propose subsequence dynamic time warping (SDTW) to find a match
+ to an example utterance of a keyword as a subsequence of features from
+ a target recording.
+\end_layout
+
+\begin_layout Standard
+
+\color black
+In summary, performance of the few works on keyword and key-phrase spotting
+ for singing is not sufficiently good for practical applications.
+ A probable reason for this is that hitherto approaches do not take into
+ account the duration of syllables, which, as stated above, is an important
+ factor that distinguishes speech from singing.
+ In addition to that, syllable durations have been shown to be a strong
+ reinforcing cue for the related task of automatically synchronizing lyrics
+ and singing voice 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Dzhambazov"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Position-aware DBN-HMMs
+\end_layout
+
+\begin_layout Standard
+The modeling in most of the above mentioned approaches relies on HMMs.
+ A drawback of HMMs is that their capability to model exact state durations
+ is restricted, because the wait time in a state is implicitly set to a
+ geometric distribution
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+ REF?
+\end_layout
+
+\end_inset
+
+.
+
+\color red
+ 
+\end_layout
+
+\begin_layout Standard
+One alternative to tackle durations can be seen in dynamic Bayesian networks
+ (DBN) 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "murphy2002dynamic"
+
+\end_inset
+
+, which allow modeling of 
+\color black
+interdependent musical aspects
+\color inherit
+ in terms of probabilistic dependencies.
+ In 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "WhiteleyEtAl_2006_BayeModeOfTemp"
+
+\end_inset
+
+ it was proposed how to apply DBNs to represent
+\color black
+ jointly tempo and the position in a musical bar as latent variables in
+ a HMM.
+ In a later work this idea was extended by explicitly modeling rhythmic
+ patters to track beats in music signals 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "krebs2013rhythmic"
+
+\end_inset
+
+.
+ Relying on a similar DBN-based scheme, in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "holzapfelsection"
+
+\end_inset
+
+ it has been shown, that the dependence of score position on structural
+ sections makes it possible to link musical performances to score.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\color black
+detail: These approaches have in common the strategy to  assign a variable
+ that tracks some musical aspect with sequential nature.
+\end_layout
+
+\end_inset
+
+ In this paper for brevity we will refer to HMMs, which use DBNs to describe
+ their hidden states, as DBN-HMMs.
+ 
+\end_layout
+
+\begin_layout Section
+Approach Overview
+\end_layout
+
+\begin_layout Standard
+
+\color black
+In this work we model the position in a lyrics query as a latent variable
+ in a DBN-HMM, in a way that integrates syllable durations and the features,
+ capturing phoneme acoustics.
+ 
+\color inherit
+Figure 1 presents an overview of the proposed approach.
+ A user can select a query phrase from the lyrics of a composition of interest.
+ Input are an audio recording, the queried lyrics and their corresponding
+ excerpt from musical score.
+ Only recordings of performances of the composition of the query are being
+ searched.
+ Output is a ranked list of  retrieved hit audio segments and their timestamps.
+\end_layout
+
+\begin_layout Standard
+We suggest a two-stage retrieval approach: In the first stage a SDTW retrieves
+ a set of candidate audio segments that 
+\color black
+are acoustically similar to
+\color inherit
+ a simple query, which has no duration information.
+ In the second stage the phonemes from the query and syllable durations
+ are modeled by a novel DBN-HMM aware of the position in music score (in
+ short position-DBN-HMM).
+ Next, we run a Viterbi decoding on each candidate segment separately.
+ Viterbi assures that only one (the most optimal) path is detected for each
+ candidate audio segment.
+ Any query-to-audio fullpath match is considered as a hit and all hit results
+ are ranked according to the weights derived from the Viterbi decoded path.
+ In what follows each of the two stages is described in details, preceded
+ by remarks on tempo estimation and how a query key-phrase is handled.
+ 
+\end_layout
+
+\begin_layout Subsection
+Tempo factor estimation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Tempo-factor-estimation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Often a performance is not played at the tempo indicated in the score.
+ We follow the method of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "sertanTonic"
+
+\end_inset
+
+ to extract tempo by matching pitch values extracted from performance and
+ pitch-values for the first section from the score.
+ The angle of the most salient diagonal matching line segment in the distance
+ matrix reveals the actual tempo 
+\begin_inset Formula $T$
+\end_inset
+
+ for the recording.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Often a performance is not played at the tempo indicated in the score.
+ To estimate a factor 
+\begin_inset Formula $\tau$
+\end_inset
+
+, by which the average tempo of the performance differs relative to the
+ score tempo, we use the tonic-independent partial audio-score alignment
+ methodology explained in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "sertanTonic"
+
+\end_inset
+
+.
+ The method uses Hough transform, a simple line detection method 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "duda1972use"
+
+\end_inset
+
+, to locate the initial section from score in the audio recording.
+ We derive the tempo factor 
+\begin_inset Formula $\tau$
+\end_inset
+
+ from the angle 
+\begin_inset Formula $\theta$
+\end_inset
+
+ of the detected line (approximating the alignment path) in the similarity
+ matrix between the score subsequence and the audio recording.
+ 
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+DETAIL: as 
+\begin_inset Formula $T_{p}\approx\tan(\theta)T_{s}$
+\end_inset
+
+, where 
+\begin_inset Formula $T_{s}$
+\end_inset
+
+ is the tempo given in the score and T_p of the performance 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+IMPL: LyricsWithModels.LyricsWithModels.duration2numFrameDuration
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename figs/candidateSegments.eps
+	lyxscale 20
+	width 90page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Distance matrix 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+ for an audio excerpt of around 100 seconds.
+ Retrieved paths are depicted as black contours.
+ White vertical lines indicate beginning (dashed) and ending (dotted) of
+ candidate audio segments, whereas red lines with triangle markers surround
+ the ground truth regions.
+ 
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:candPathSet"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Query construction
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Query-construction"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A selected lyrical phrase serves as a query twice: first a 
+\emph on
+simple query
+\emph default
+ for retrieval of candidate segments and then a 
+\emph on
+duration-informed query
+\emph default
+ for the decoding with position-DBN-HMM.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Acoustic features
+\end_layout
+
+\begin_layout Standard
+For each of 38 Turkish phonemes (and for a silent pause model) a 3-state
+ HMM is trained from a 5-hours corpus of Turkish speech 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Salor2007580"
+
+\end_inset
+
+.
+ The 3 states represent respectively the beginning, middle and ending acoustic
+ state of a phoneme.
+ The transition probabilities of the HMMs are not taken into account.
+ The phoneme set utilized has been developed for Turkish and is described
+ in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Salor2007580"
+
+\end_inset
+
+.
+ The formant frequencies of spoken phonemes can be induced from the spectral
+ envelope of speech.
+ To this end, we utilize the first 12 MFCCs and their delta to the previous
+ time instant.
+ For each state a 9-mixture Gaussian distribution is fitted on the feature
+ vector.
+\end_layout
+
+\begin_layout Subsubsection
+Simple query
+\end_layout
+
+\begin_layout Standard
+For the first step no score-position information is utilized: lyrics is
+ merely expanded to its constituent phoneme models.
+ Let 
+\begin_inset Formula $\lambda_{n}\in\Lambda$
+\end_inset
+
+ be a state of phoneme model at position 
+\begin_inset Formula $n$
+\end_inset
+
+ in the query, where 
+\begin_inset Formula $\Lambda$
+\end_inset
+
+ is a set of all 
+\begin_inset Formula $3\times38$
+\end_inset
+
+ states for the 38 phonemes.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Duration-informed query
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Duration-informed-query"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Unlike the simple query, a duration-informed query exploits the note-to-syllable
+ mappings, present in sheet music.
+ 
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+DETAIL: Let 
+\begin_inset Formula $\nu$
+\end_inset
+
+ be the duration of the shortest note from score, which could have a syllable
+ assigned.
+ In this work we opted for 64-th note 
+\begin_inset Formula $\nu=\frac{1}{64}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+For each syllable a reference duration is derived by aggregating values
+ of its associated musical notes.
+ Then the reference durations are spread among its constituent phonemes
+ in a rule-based manner, resulting in reference durations 
+\begin_inset Formula $R_{\phi}$
+\end_inset
+
+ for each phoneme 
+\begin_inset Formula $\phi$
+\end_inset
+
+ 
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+In this work a simple rule is applied: consonants are assigned a fixed duration
+ (0.1 seconds) and the rest of the syllable is assigned to the vowel.
+ 
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To query a particular performance of a composition, 
+\begin_inset Formula $R_{\phi}$
+\end_inset
+
+ are rescaled by the tempo factor 
+\begin_inset Formula $\tau$
+\end_inset
+
+ (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Tempo-factor-estimation"
+
+\end_inset
+
+).
+ 
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+DETAIL: 
+\backslash
+psi is the number of time frames per 
+\begin_inset Formula $\nu$
+\end_inset
+
+ according to the reference musical tempo 
+\begin_inset Formula $T_{p}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Plain Layout
+
+\color black
+\begin_inset Formula 
+\begin{equation}
+\psi=\frac{1}{h}\thinspace\frac{T_{p}}{60}\nu
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+where 
+\begin_inset Formula $T_{p}$
+\end_inset
+
+ is in 
+\begin_inset Formula $bpm$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+ is hop size of a frame in seconds (
+\begin_inset Formula $h=0.01$
+\end_inset
+
+ in this work)
+\end_layout
+
+\end_inset
+
+Now this allows to define a mapping 
+\begin_inset Formula 
+\begin{equation}
+f(p_{n},s_{n})\rightarrow\lambda_{n}\label{eq:mapping-function}
+\end{equation}
+
+\end_inset
+
+ that determines the true state 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ from a phoneme network, being sung at position 
+\begin_inset Formula $p_{n}$
+\end_inset
+
+ within a section 
+\begin_inset Formula $s_{n}$
+\end_inset
+
+.
+ A position 
+\begin_inset Formula $p_{n}$
+\end_inset
+
+ can span the duration of a section 
+\begin_inset Formula $D(s_{n})=\sum_{\phi\in s_{n}}R_{\phi}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+IMPL in /Users/joro/Documents/Phd/UPF/voxforge/myScripts/AlignmentDuration/dtw/l
+yrics2lyrics.py
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Retrieval of candidate segments
+\end_layout
+
+\begin_layout Standard
+
+\color black
+SDTW has proven to be an effective way to spot lyrics, in which the feature
+ series of an audio query can be seen as a subsequence of features of a
+ target audi
+\color inherit
+o 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dittmar2012towards"
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+maybe here ref.
+ anguera
+\end_layout
+
+\end_inset
+
+.
+ In our case a query of phoneme models 
+\begin_inset Formula $\Lambda$
+\end_inset
+
+ with length 
+\begin_inset Formula $M$
+\end_inset
+
+ can be seen as subsequence of the series of MFCC features with length 
+\begin_inset Formula $N$
+\end_inset
+
+, extracted from the whole recording.
+ To this end we define a distance metric for an audio frame 
+\begin_inset Formula $y_{m}$
+\end_inset
+
+ and model state 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ as a function of the posterior probability.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+d(m,n)=-\log\thinspace P(y_{m}|\lambda_{n})\label{eq:distaMetric}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where for phoneme state model 
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+P(y_{m}|\lambda_{n})=\sum_{c=1}^{9}w_{c,\lambda_{n}}\mathcal{N}(y_{m};\mu_{c,\lambda_{n}},\Sigma_{c,\lambda_{n}})\label{eq:GMM-distribution}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathcal{N}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ being the Gaussian distribution from a 9-component mixture with weights
+ 
+\begin_inset Formula $w_{c,\lambda_{n}}$
+\end_inset
+
+.
+ Based on the distance metric 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:distaMetric"
+
+\end_inset
+
+ a distance matrix 
+\begin_inset Formula $\mathcal{D}{}^{NxM}$
+\end_inset
+
+ is constructed.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+DETAIL: cut off from historgram of at peak of 3 most probable dists is computed:
+ 
+\end_layout
+
+\begin_layout Plain Layout
+IMPL: /Users/joro/Documents/Phd/UPF/voxforge/myScripts/AlignmentDuration/dtw/lyr
+ics/cutOffDists.m
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Path computation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Path-computation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let a warping path 
+\begin_inset Formula $\Omega$
+\end_inset
+
+ be a sequence of 
+\begin_inset Formula $L$
+\end_inset
+
+ points 
+\begin_inset Formula $(\omega_{1},..,\omega_{l})$
+\end_inset
+
+, 
+\begin_inset Formula $l\in[1,L]$
+\end_inset
+
+ and 
+\begin_inset Formula $\omega_{l}=(m,n)$
+\end_inset
+
+ refers to an entry 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $d(m,n)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ in 
+\begin_inset Formula $\mathcal{D}$
+\end_inset
+
+.
+ Following the strategy and notation of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "muller2007information"
+
+\end_inset
+
+ to generate 
+\begin_inset Formula $\Omega$
+\end_inset
+
+ we select step sizes 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\omega_{l}-\omega_{l-1}\in\{(1,1),(1,0),(1,2)\}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ corresponding respectively to diagonal, horizontal and skip step.
+ A horizontal step means staying in the same phoneme in next audio frame.
+ The step size 
+\begin_inset Formula $(0,1)$
+\end_inset
+
+ is disallowed because each frame has to map to exactly one phoneme model.
+  To counteract the preference for the diagonal 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+and the skip step
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+, we set rather high values for the local weights 
+\begin_inset Formula $w_{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{s}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "muller2007information"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+A list of 
+\begin_inset Formula $r$
+\end_inset
+
+ candidate paths 
+\begin_inset Formula $(\Omega_{1}^{*},...\Omega_{r}^{*})$
+\end_inset
+
+ is computed by iteratively detecting the current path with maximum score.
+ After having detected a path 
+\begin_inset Formula $\Omega^{*}$
+\end_inset
+
+ with final position in frame 
+\begin_inset Formula $n^{*}$
+\end_inset
+
+ a small region of 
+\begin_inset Formula $5\%$
+\end_inset
+
+ of 
+\begin_inset Formula $M$
+\end_inset
+
+: 
+\begin_inset Formula $(n^{*}-5\%M,\thinspace n^{*}+5\%M)$
+\end_inset
+
+ is blacklisted from further iterations, as described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "muller2007information"
+
+\end_inset
+
+.
+ This assures that the iterative procedure will not get stuck in a set of
+ paths from a vicinity of a local maximum, but instead will retrieve as
+ many relevant audio segments as possible.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+TODO: make sure minimal unit imposes fastest tempo.
+\end_layout
+
+\begin_layout Plain Layout
+If some phoneme not pronounced, might be good idea to allow (1,2).
+ [ref.
+ Ney] but we do not do it, since we want to resemble forced alignment.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+IMPL: /Users/joro/Documents/Phd/UPF/voxforge/myScripts/lyrics_magic/queryByLyric
+sVsLyrics/doitSDTWParams.m and in particular: /Users/joro/Documents/Phd/UPF/voxfo
+rge/myScripts/lyrics_magic/queryByLyrics/subSequence_dtw.m
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Candidate segment selection
+\end_layout
+
+\begin_layout Standard
+Analysis of the detected query segments revealed that a path often matches
+ only partially the correct section segment.
+ However, usually different parts of a segment have been detected in neighbourin
+g paths.
+ To handle this, we consider candidate segments - segments from the target
+ audio, within which a frame 
+\begin_inset Formula $y_{m}$
+\end_inset
+
+ belongs to more than one path 
+\begin_inset Formula $\Omega$
+\end_inset
+
+.
+ In other words, a candidate segment spans audio from the initial timestamp
+ of the leftmost path to the final timestamp of the rightmost path.
+ An example of retrieved candidate segments is presented in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:candPathSet"
+
+\end_inset
+
+.
+ It can be seen that the two ground truth regions lie within candidate segments,
+ which consist of more than one path.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+IMPL: /Users/joro/Documents/Phd/UPF/voxforge/myScripts/lyrics_magic/queryByLyric
+sVsLyrics/calcCandidateSegments.ipynb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Position-DBN-HMM
+\end_layout
+
+\begin_layout Standard
+In this section we present a novel probabilistic model for modeling a lyrical
+ phrase.
+ The main idea of the model is to incorporate the phonetic identities of
+ lyrics and the syllable durations, available from musical score, into a
+ coherent unit.
+ The dependence of the observed MFCC features (that capture the phonetic
+ identity) on musical velocity and score position are presented as DBN in
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "dbn-model"
+
+\end_inset
+
+.
+ The derivation of model dependencies and parameters is the main contribution
+ of this work.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename dbn-model_withNames.eps
+	height 27page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Representation of the hidden layers of the proposed model as a dynamic Bayesian
+ network.
+ Hidden variables (not shaded) are v - velocity, p - score position and
+ s - section.
+ The observed feature vector y is not shaded.
+ Squares and circles denote respectively continuous and discrete variables
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "dbn-model"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hidden variables
+\end_layout
+
+\begin_layout Enumerate
+Position 
+\begin_inset Formula $p_{n}$
+\end_inset
+
+ from musical score for a section (
+\begin_inset Formula $p_{n}\in\{1,...,D(s_{n})\}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+).
+ 
+\begin_inset Formula $D(s_{n}=Q)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\color black
+is the total duration for a section 
+\begin_inset Formula $s_{n}$
+\end_inset
+
+ as defined in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Duration-informed-query"
+
+\end_inset
+
+.
+ Note that 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $D(s_{n})$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color black
+ for a given section is different for two performances with different tempo,
+ because of the tempo factor 
+\begin_inset Formula $\tau$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Velocity 
+\begin_inset Formula $v_{n}\in\{1,2,...,V\}$
+\end_inset
+
+.
+ Unit is the number of score positions per audio frame.
+ Staying in state 
+\begin_inset Formula $v_{n}=2$
+\end_inset
+
+, for example, means that the current tempo is steady and around 2 times
+ faster than the slowest one.
+\end_layout
+
+\begin_layout Enumerate
+Structural section 
+\begin_inset Formula $s_{n}\in\{Q,F\}$
+\end_inset
+
+ where 
+\color black
+
+\begin_inset Formula $Q$
+\end_inset
+
+
+\color inherit
+ is the queried section and 
+\begin_inset Formula $F$
+\end_inset
+
+ is a filler section.
+ A filler section represents any non-key-phrase audio regions, and practically
+ allows with equal probability being in any phoneme state (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Observation-model"
+
+\end_inset
+
+)  
+\end_layout
+
+\begin_layout Standard
+We compensate for tempo deviations by varying the local step size of the
+ 
+\begin_inset Formula $v$
+\end_inset
+
+ variable.
+ To allow handling deviations of up to half tempo, the derived 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $D(s_{n}=Q)$
+\end_inset
+
+ is multiplied by 2.
+ This means that 
+\begin_inset Formula $v=1$
+\end_inset
+
+ corresponds to half of the detected tempo.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+For the experiments reported in this paper, we chose 
+\begin_inset Formula $V=5$
+\end_inset
+
+.
+ Furthermore we
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ set 
+\begin_inset Formula $D(s_{n}=F)=V$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+.
+ This assures that even in fastest tempo there is an option of entering
+ the filler section.
+\end_layout
+
+\begin_layout Standard
+The proposed model is different than the model proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "krebs2013rhythmic"
+
+\end_inset
+
+ in two aspects: 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $D(s_{n}=Q)$
+\end_inset
+
+ is not fixed but depends on the section of interest and the detected tempo
+ of performance 
+\end_layout
+
+\begin_layout Itemize
+a section 
+\begin_inset Formula $s_{n}$
+\end_inset
+
+ (a pattern in the original model) is not fixed, but can vary between a
+ query and filler states 
+\begin_inset Formula $\{Q,F\}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+Since all the hidden variables are discrete, one can reduce this model to
+ a regular HMM by merging all variables into a single 'meta-variable' 
+\begin_inset Formula $x_{n}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+x_{n}=[v_{n},\thinspace p_{n},\thinspace s_{n}]
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the state space becomes the Cartesian product of the individual
+ variables.
+\end_layout
+
+\begin_layout Subsection
+Transition model
+\end_layout
+
+\begin_layout Standard
+Due to the conditional independence relations presented in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "dbn-model"
+
+\end_inset
+
+, the transition model reduces to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{cc}
+P(x_{n}|x_{n-1})= & P(v_{n}|v_{n-1},s_{n-1})\thinspace\times\\
+P(p_{n}|v_{n-1},p_{n-1},s_{n-1})\thinspace\times & P(s_{n}|p_{n-1},s_{n-1},p_{n})
+\end{array}
+\end{equation}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Velocity transition
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{equation}
+\backslash
+label{eq:1}
+\end_layout
+
+\begin_layout Plain Layout
+
+ p(v_{n}|v_{n-1})=
+\backslash
+begin{cases}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+phi/2, & v_{n}=v_{n-1}
+\backslash
+pm1
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+1-
+\backslash
+phi, & v_{n}=v_{n-1}
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+0, & 
+\backslash
+text{else}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{cases}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{equation}
+\end_layout
+
+\begin_layout Plain Layout
+
+where $
+\backslash
+phi$ is a constant probability of change in velocity.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Position transition 
+\end_layout
+
+\begin_layout Standard
+The score position is defined deterministically according to:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p_{n}=(p_{n-1}+v_{n-1}-1)\quad\mod D(s_{n-1})+1
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the modulus operator resets the position to be in a beginning of a
+ new section after it exceeds the duration of previous section 
+\begin_inset Formula $D(s_{n-1})$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Section transition
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+P(s_{n}|p_{n-1},s_{n-1},p_{n})=\begin{cases}
+P(s_{n}|s_{n-1}), & p_{n}\leq p_{n-1}\\
+1,\thinspace\thinspace p_{n}>p_{n-1}\thinspace\mbox{\&} & s_{n}=s_{n-1}
+\end{cases}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A lack of increase in the position is an indicator that a new section should
+ be started.
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $P(s_{n}|s_{n-1})$
+\end_inset
+
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+is set according to a transition matrix 
+\begin_inset Formula $A=\{a_{ij}\}$
+\end_inset
+
+ where 
+\begin_inset Formula $i\in\{Q,F\}$
+\end_inset
+
+ and self transitions 
+\begin_inset Formula $a_{QQ}$
+\end_inset
+
+ and 
+\begin_inset Formula $a_{FF}$
+\end_inset
+
+ for query and filler section respectively can be set to reflect the expected
+ structure of the target audio signal.
+ In this work we set 
+\begin_inset Formula $a_{QQ}=0$
+\end_inset
+
+, since we expect that a query might be decoded at most once in a candidate
+ audio segment.
+ The value 
+\begin_inset Formula $a_{FF}=0.9$
+\end_inset
+
+ is determined empirically.
+\end_layout
+
+\begin_layout Subsection
+Observation model
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Observation-model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the query section the probability of the observed feature vector in
+ position 
+\begin_inset Formula $p_{n}$
+\end_inset
+
+ from section 
+\begin_inset Formula $s_{n}$
+\end_inset
+
+ is computed for the model state 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\lambda_{n}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+by a mapping function 
+\begin_inset Formula $f(p_{n},s_{n})$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+, introduced in section 
+\color black
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Query-construction"
+
+\end_inset
+
+.
+
+\color red
+ 
+\color black
+A similar mapping function has been proposed for the first time in the DBN-HMM
+ in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "holzapfelsection"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Then 
+\begin_inset Formula 
+\begin{equation}
+P(y_{n}|p_{n},s_{n}=Q)=P(y_{n}|\lambda_{n})
+\end{equation}
+
+\end_inset
+
+ which reduces to applying the distribution defined in Equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:GMM-distribution"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In case of the filler section the most likely phoneme state is picked.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula 
+\begin{equation}
+P(y_{n}|p_{n},s_{n}=F)=\max_{\lambda\in\Lambda}P(y_{n}|\lambda)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that position 
+\begin_inset Formula $p_{n}$
+\end_inset
+
+ plays a role only in tracking the total section duration 
+\begin_inset Formula $D(s_{n}=F)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Inference
+\end_layout
+
+\begin_layout Standard
+
+\color black
+An exact inference of the 'meta-variable' 
+\begin_inset Formula $x$
+\end_inset
+
+ can be performed by means of the Viterbi algorithm.
+ A key-phrase is detected whenever the Viterbi path 
+\begin_inset Formula $\bar{\Omega}$
+\end_inset
+
+ passes through a section 
+\begin_inset Formula $s_{n}=Q$
+\end_inset
+
+ and the last position 
+\begin_inset Formula $D(s_{n}=Q)$
+\end_inset
+
+ is reached.
+\end_layout
+
+\begin_layout Subsection
+Paths ranking
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Paths-ranking"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then all detected occurrences are ranked according to their acoustic similarity
+ to the query, which is computed from the average likelihood:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+w=\frac{1}{L}\sum_{l=1}^{L}P(\omega_{l})\label{eq:weights}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $P(\omega_{l})=P(y_{m}|\lambda_{n})$
+\end_inset
+
+ is the observation probability of a point 
+\begin_inset Formula $\omega_{l}=(m,n)$
+\end_inset
+
+ from the Viterbi path.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+IMPL: /Users/joro/Documents/Phd/UPF/voxforge/myScripts/searchByLyricsHHMM/weight
+Paths
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Dataset
+\end_layout
+
+\begin_layout Standard
+
+\color black
+The test dataset consists of 12 a-cappella performances of 9 compositions
+ 
+\color inherit
+with total duration of 
+\color black
+19 minutes.
+ The compositions are drawn from the CompMusic corpus of classical Turkish
+ Makam repertoire 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "uyar2014corpus_dlfm"
+
+\end_inset
+
+.
+ The a-capella versions have been sung by professional singers and recorded
+ especially for this study.
+ 
+\color inherit
+Scores are provided in the machine-readable symbTr format 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "karaosmanouglu2012turkish"
+
+\end_inset
+
+, which contain marks of section divisions.
+ A performance has been recorded in-sync with the original recording, whereby
+ instrumental sections are left as silence.
+ This assures that the order, in which sections are performed, is kept the
+ samе
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+The dataset is available here: http://compmusic.upf.edu/turkish-makam-acapella-sec
+tions-dataset
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We consider as a query 
+\begin_inset Formula $q$
+\end_inset
+
+ each section from the scores, which has unique lyrics: in total 32.
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+Note that the search space is restricted to 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+all recordings of the composition, from which the section is taken.
+ In a given recording we annotated the section boundary timestamps.
+ Let 
+\begin_inset Formula $C_{q}$
+\end_inset
+
+ be the total number of relevant occurrences (cardinality) of a query 
+\begin_inset Formula $q$
+\end_inset
+
+.
+ Table 1 presents the average cardinality 
+\begin_inset Formula $\bar{C_{q}}$
+\end_inset
+
+ and other relevant statistics about sections.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+statistic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#section queries
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+average cardinality 
+\begin_inset Formula $\bar{\ensuremath{C_{q}}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3.2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maximum cardinality 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $C_{qM}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#words per section
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5-14
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#sections per recording
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6-16
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+#phonemes per section
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26-63
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Statistics about queries (lyrics sections with unique lyrics) in the test
+ dataset.
+ The low value of 
+\begin_inset Formula $\bar{C_{q}}$
+\end_inset
+
+ are due to the small number of performances per composition.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Evaluation 
+\end_layout
+
+\begin_layout Subsection
+Evaluation metrics
+\end_layout
+
+\begin_layout Standard
+Having a ranked list of occurrences of each lyrical query, the search-by-lyrics
+ can be interpreted as a ranked retrieval problem, in which the users are
+ interested in checking only the top 
+\begin_inset Formula $K$
+\end_inset
+
+ relevant results 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Manning:2008:IIR:1394399"
+
+\end_inset
+
+.
+ This allows to reject irrelevant results by considering only top 
+\begin_inset Formula $K$
+\end_inset
+
+ results in the evaluation metric.
+ We consider this strategy as appropriate since a query has low average
+ cardinality (
+\begin_inset Formula $\bar{C_{q}}=3.2$
+\end_inset
+
+).
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Let the relevance of ranked results for a query 
+\begin_inset Formula $q$
+\end_inset
+
+ be 
+\begin_inset Formula $[r_{q}(1),...,r_{q}(n_{q})]$
+\end_inset
+
+ where 
+\begin_inset Formula $n_{q}$
+\end_inset
+
+ is the number of retrieved occurrences.
+ Note that a detected audio segment is either hit or not,  making 
+\begin_inset Formula $r_{q}(k)\in\{0,1\}$
+\end_inset
+
+.
+ The results are ranked by the weights defined in Equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:weights"
+
+\end_inset
+
+.
+ Now the recall and precision of a query at rank index K are defined respectivel
+y as:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{equation}
+\end_layout
+
+\begin_layout Plain Layout
+
+R_q(K) = 
+\backslash
+frac{1}{C_q}
+\backslash
+sum_{k = 1}^K r_{q}(k), 
+\backslash
+quad P_q(K) =
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+frac{1}{K}
+\backslash
+sum_{k = 1}^K r_{q}(k)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+label{eqn:recallPrecision}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{equation}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+and the average precision as 
+\begin_inset Formula 
+\[
+\begin{array}{c}
+\bar{P}_{q}=\frac{1}{C_{q}}\sum_{k=1}^{n_{q}}r_{q}(k)P_{q}(k)\end{array}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+For each of the queried score sections an average precision 
+\begin_inset Formula $\bar{P}_{q}$
+\end_inset
+
+ at different values of 
+\begin_inset Formula $K$
+\end_inset
+
+ is computed as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\begin{array}{c}
+\bar{P}_{q}=\frac{1}{C_{q}}\sum_{k=1}^{K}r_{q}(k)P_{q}(k)\end{array}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+as defined in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Manning:2008:IIR:1394399"
+
+\end_inset
+
+, where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $P_{q}(k)$
+\end_inset
+
+ is precision at 
+\begin_inset Formula $k$
+\end_inset
+
+.
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The relevance 
+\begin_inset Formula $r_{q}(k)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ of 
+\begin_inset Formula $k^{th}$
+\end_inset
+
+ retrieved occurrence is binary and set to 1 only if both retrieved boundary
+ timestamps are within a tolerance window of 
+\begin_inset Formula $0.5$
+\end_inset
+
+ seconds from ground truth.
+ This window size has become a standard for detecting short structural segments
+ in the MIREX competition 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "TurnbullEtAl_2007_ASupeApprFor"
+
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+FUTURE: If we had a bigger dataset with more duration in tempo, a more involved
+ segmented search space (Sankalp) strategy could be used.
+\end_layout
+
+\end_inset
+
+ The hits are ranked by the weights defined in Equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:weights"
+
+\end_inset
+
+.
+ Results are reported in terms of mean average precision (MAP) as the average
+ over all 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\bar{P}_{q}$
+\end_inset
+
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Experiments
+\end_layout
+
+\begin_layout Standard
+
+\color black
+To assess the benefit of the proposed modeling of positions, we conduct
+ a comparison of the performance of the complete system and a baseline version
+ without the position-DBN-HMM
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+To facilitate reproducibility of this research source code is publicly available
+ here: https://github.com/georgid/Position-DBN-HMM-Lyrics
+\end_layout
+
+\end_inset
+
+.
+ For the baseline, as result set we consider the audio segments corresponding
+ to the list of candidate paths 
+\color inherit
+
+\begin_inset Formula $(\Omega_{1}^{*},...\Omega_{r}^{*})$
+\end_inset
+
+
+\color black
+ derived after SDTW (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Path-computation"
+
+\end_inset
+
+).
+
+\color inherit
+ Note that SDTW-paths were sorted 
+\color black
+according to the sum of distance metrics 
+\begin_inset Formula $d(m,n)$
+\end_inset
+
+, which is derived from the observation probability.
+ Thus, 
+\color inherit
+the strategies for computing weights for both SDTW and Viterbi are based
+ on acoustic similarity (and thus are consistent with each other).
+ We report results at different values for 
+\begin_inset Formula $K$
+\end_inset
+
+ in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MAPS-table"
+
+\end_inset
+
+.
+ Results for 
+\begin_inset Formula $K>C_{qM}$
+\end_inset
+
+ are ommited.
+ Furthermore, we picked empirically 
+\begin_inset Formula $r=16$
+\end_inset
+
+ candidate paths in SDTW, which is twice 
+\begin_inset Formula $C_{qM}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The results confirm the expectation that the performance of SDTW alone is
+ inferior.
+ Retrieving relevant candidate paths seemed to be very dependent on the
+ weights 
+\begin_inset Formula $w_{d}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{s}$
+\end_inset
+
+ for the diagonal and skip steps.
+  We noted that adapting weights for a recording according to the detected
+ tempo factor 
+\begin_inset Formula $\tau$
+\end_inset
+
+ might be beneficial, but did not conduct related experiments in this work.
+ The optimal values (
+\begin_inset Formula $w_{d}=6.5$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{s}=11$
+\end_inset
+
+) in fact guaranteed good coverage of relevant segments in the slowest tempo
+ in the dataset.
+ 
+\color blue
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\color blue
+The goas of DTW is to retrieve candidates, which results in high recall
+ with the sacrifice of precision.
+ For DTW the MAPS saturates after some k=5 recall as the , ranking metric
+ does not order results well - why? 
+\end_layout
+
+\begin_layout Plain Layout
+
+\color blue
+By tuning the parameters of DTW, we retrieve a high-recall candidate set.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The MAP for the complete system has a peak when considering the first 3
+ hits from the ranked result list.
+ This indicates that the true positives are among the top ranks, because
+ 
+\begin_inset Formula $\bar{C_{q}}=3.2$
+\end_inset
+
+.
+ In general, MAP after decoding of candidate segment with position-modeling,
+ is substantially better than the baseline, which suggests that modeling
+ syllable durations is beneficial.
+ Another reason might be that the position-DBN-HMM models tempo and is thus
+ not affected by the difference between the tempo indicated in the score
+ and the real performance tempo.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="7">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+K
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+SDTW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28.3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23.7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38.3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+36.2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+37.0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+39.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+DBN-HMM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+48.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+59.3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+64.6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+61.0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+41.3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+42.4
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+MAPs (in percent) for ranked result segments for two system variants: baseline
+ with SDTW and complete with position-DBN-HMM.
+ 
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "MAPS-table"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Comparison to related work
+\end_layout
+
+\begin_layout Standard
+For the sake of comparison to any future work we report in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "f-measure"
+
+\end_inset
+
+ the f-measure, derived from the precision 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $P_{q}(k)$
+\end_inset
+
+ and recall
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $R_{q}(k)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ as defined in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Manning:2008:IIR:1394399"
+
+\end_inset
+
+.
+ 
+\color black
+Unfortunately, no direct comparison to previous work on keyword/key-phrase
+ spotting in singing 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kruspekeyword,fujihara2008hyperlinking"
+
+\end_inset
+
+ is possible, because these works rely on speech models for languages different
+ from Turkish.
+ 
+\color inherit
+Furthermore, the evaluation setting in none of the works is comparable to
+ ours.
+ 
+\end_layout
+
+\begin_layout Standard
+In 
+\color black
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kruspekeyword"
+
+\end_inset
+
+
+\color inherit
+ a result is considered true positive if a keyword is detected at any position
+ in an expected audio clip.
+ The authors argue that since a clip spans one line of lyrics (only 1 to
+ 10 words) this is sufficiently exact, whereas we are interested in detecting
+ the exact timestamps of a key-phrase.
+ In addition to that, their longest query has 8 phonemes, which is much
+ less than the average in our setting.
+ 
+\color red
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\color red
+Their total audio duration is ...
+ To simulate a similar evaluation setting we conduct an experiment where
+ a hit is considered as.
+ TODO: write as well results as f-measure.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\color black
+In 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "fujihara2008hyperlinking"
+
+\end_inset
+
+ the accuracy of the key-phrase spotting module is not reported, but instead
+ only the percentage of the correctly detected links connecting key-phrases
+ from a song to another song.
+ It can be inferred from it that an upper bound on the performance of the
+ key-phrase spotting lies around an accuracy of 30%.
+ Further, on creating a link for a given key-phrase only the candidate section
+ with highest score for a song has been considered, which might ignore any
+ other true positives.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="7">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+K
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+DBN-HMM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32.4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+34.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+49.6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+63.2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+58.2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+59.3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+F-measure (in percent) for the position-DBN-HMM for ranked results segments
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "f-measure"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+In this study we have investigated an important problem that has started
+ to attract attention of researchers only recently.
+ We tackle the linking between audio and structural sections from the perspectiv
+e of lyrics: we proposed a method for searching in musical audio for the
+ occurrences of a characteristic section-long lyrical phrase.
+ We presented a novel DBN-based HMM for tracking sung phoneme durations.
+ Evaluation on a-cappella material from Turkish Makam music shows that the
+ search with the proposed model brings substantial improvement compared
+ to a baseline system, unaware of syllable durations.
+ 
+\end_layout
+
+\begin_layout Standard
+We plan to focus future work on applying the proposed model to the case
+ of polyphonic singing.
+ We expect further, that this work can serve as a baseline for further research
+ on singing material with similar musical characteristics.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Can be applied for structure detection in performances where the structure
+ of the piece might differ significantly form the score (andre describes
+ this well).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We want to point as well that, the proposed score-informed scheme is applicable
+ not necessarily only when musical scores are available.
+ Scores can be replaced by any format, from which duration information can
+ be inferred: for example annotated melodic contour or singer-created indication
+s along the lyrics.
+\end_layout
+
+\begin_layout Subparagraph*
+Acknowledgements
+\end_layout
+
+\begin_layout Standard
+This work is partly supported by the European Research Council under the
+ European Union’s Seventh Framework Program, as part of the CompMusic project
+ (ERC grant agreement 267583) and partly by the AGAUR research grant.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+% For bibtex users:
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/Users/joro/Documents/Phd/UPF/papers/FMA2014_tex_fullPaper/JabRefLyrics2Audio,/Users/joro/Documents/Phd/UPF/papers/FMA2014_tex_fullPaper/JabRefCompMusicNon-Lyrics,/Users/joro/Documents/Phd/UPF/papers/FMA2014_tex_fullPaper/JabRef_saerch_by_lyrics"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

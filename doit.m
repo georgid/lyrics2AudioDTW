@@ -76,7 +76,7 @@ end
 addpath('visualize');
 
 visualizeDistMatrix(totalDistMatrix, 0, 0);
-visualizePath(totalDistMatrix, 0, 0, URI_targetFile_noExt, listPhonemesWithStates, pathXs, pathYs)
+visualizePath(totalDistMatrix, 0, 0, URI_targetFile_noExt, listPhonemesWithStates);
 hold on; plot(pathXs, pathYs, '*', 'Color', 'k' );
 
 

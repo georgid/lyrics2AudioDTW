@@ -33,7 +33,7 @@ for d=1:numPhonemesInTranscript
 		for whichState = 1:numStates
 			
 			
-			[means, vars2, weights] = loadModels(pathToModels, currModelName, whichState,  hasDeltas );
+			[means, vars2, weights] = loadModels(pathToModels, currModelName, whichState-1,  hasDeltas );
 
 
 			gmm = gmdistribution(means,vars2,weights);

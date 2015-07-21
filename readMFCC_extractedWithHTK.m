@@ -1,4 +1,4 @@
-function MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas)
+function MFCCs = readMFCC_extractedWithHTK(URI_testFile_noExt, hasDeltas, startFrame, endFrame)
 %%%%%%% load htk-extraced mfcc files: 
 addpath('matlab_htk'); % for htkread.m
 addpath('../matlab_htk'); % for htkread.m
@@ -11,8 +11,12 @@ if ~exist(mfcURI)
 end
 
 
-[MFCCsAll, paramKind ]  = htkread( mfcURI  ); 	
+[MFCCsAll, paramKind ]  = htkread( mfcURI  );
 fprintf('param kind: %s', paramKind);
+
+if startFrame ~= 0 && endFrame ~= 0
+	MFCCsAll = MFCCsAll(startFrame:endFrame,:);
+end
 
 % 13 is energy
 MFCCs = MFCCsAll( :, 1:12);
